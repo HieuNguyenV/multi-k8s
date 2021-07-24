@@ -11,14 +11,26 @@ script:
   - docker run -e CI=true hieubert/react-test npm test
 
 after_success:
-  - docker build -t hieubert/multi-client ./client
-  - docker build -t hieubert/multi-nginx ./nginx
-  - docker build -t hieubert/multi-server ./server
-  - docker build -t hieubert/multi-worker ./worker
+  - docker build -t hieubert/multi-client-10-14  ./client
+  - docker build -t hieubert/multi-nginx-10-14  ./nginx
+  - docker build -t hieubert/multi-server-10-14  ./server
+  - docker build -t hieubert/multi-worker-10-14  ./worker
   # Log in to the docker CLI
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
   # Take those images and push them to docker hub
-  - docker push hieubert/multi-client
-  - docker push hieubert/multi-nginx
-  - docker push hieubert/multi-server
-  - docker push hieubert/multi-worker
+  - docker push hieubert/multi-client-10-14 
+  - docker push hieubert/multi-nginx-10-14 
+  - docker push hieubert/multi-server-10-14 
+  - docker push hieubert/multi-worker-10-14 
+
+  deploy:
+  provider: elasticbeanstalk
+  region: 'us-east-1'
+  app: 'multi-docker'
+  env: 'MultiDocker-env'
+  bucket_name: 'elasticbeanstalk-us-east-1-923445559289'
+  bucket_path: 'docker-multi'
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
